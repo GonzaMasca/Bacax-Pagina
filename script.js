@@ -1,22 +1,52 @@
 // Esperar a que el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Smooth scroll para enlaces internos (funciona con los enlaces del menú Bootstrap)
+    // ============================================
+    // 1. MENÚ HAMBURGUESA (CORREGIDO)
+    // ============================================
+    
+    // Buscar el botón hamburguesa de Bootstrap
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.getElementById('navbarToggleExternalContent');
+    
+    if (navbarToggler && navbarCollapse) {
+        console.log('✅ Menú encontrado, configurando evento...');
+        
+        // Cuando se hace clic en el botón hamburguesa
+        navbarToggler.addEventListener('click', function() {
+            // Bootstrap maneja automáticamente el toggle, solo registramos
+            console.log('🔄 Menú toggled');
+        });
+    } else {
+        console.log('❌ No se encontró el menú Bootstrap');
+        console.log('Botón:', navbarToggler);
+        console.log('Contenedor:', navbarCollapse);
+    }
+    
+    // ============================================
+    // 2. SMOOTH SCROLL PARA ENLACES INTERNOS
+    // ============================================
+    
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            
             const targetId = this.getAttribute('href');
             if(targetId === '#') return;
             
             const targetElement = document.querySelector(targetId);
             if(targetElement) {
+                e.preventDefault();
+                
                 // Cerrar el menú de Bootstrap si está abierto
-                const navbarCollapse = document.getElementById('navbarToggleExternalContent');
                 if (navbarCollapse && navbarCollapse.classList.contains('show')) {
-                    const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
-                    if (bsCollapse) {
-                        bsCollapse.hide();
+                    // Intentar cerrar con Bootstrap
+                    if (typeof bootstrap !== 'undefined') {
+                        const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                        if (bsCollapse) {
+                            bsCollapse.hide();
+                        }
+                    } else {
+                        // Fallback si Bootstrap no está cargado
+                        navbarCollapse.classList.remove('show');
                     }
                 }
                 
@@ -29,7 +59,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Efecto de animación al hacer scroll
+    // ============================================
+    // 3. ANIMACIONES AL HACER SCROLL
+    // ============================================
+    
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -45,35 +78,54 @@ document.addEventListener('DOMContentLoaded', function() {
     }, observerOptions);
     
     // Observar elementos para animación
-    document.querySelectorAll('.value-card, .service-card, .contact-card').forEach(el => {
+    document.querySelectorAll('.value-card, .service-card, .contact-card, .fleet-item').forEach(el => {
         observer.observe(el);
     });
     
-    // Cerrar menú al hacer clic fuera (opcional)
+    // ============================================
+    // 4. CERRAR MENÚ AL HACER CLIC FUERA
+    // ============================================
+    
     document.addEventListener('click', function(event) {
-        const navbarCollapse = document.getElementById('navbarToggleExternalContent');
-        const navbarToggler = document.querySelector('.navbar-toggler');
-        
         if (navbarCollapse && navbarCollapse.classList.contains('show')) {
             if (!navbarCollapse.contains(event.target) && !navbarToggler.contains(event.target)) {
-                const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
-                if (bsCollapse) {
-                    bsCollapse.hide();
+                if (typeof bootstrap !== 'undefined') {
+                    const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                    if (bsCollapse) {
+                        bsCollapse.hide();
+                    }
+                } else {
+                    navbarCollapse.classList.remove('show');
                 }
             }
         }
     });
+    
+    // ============================================
+    // 5. VERIFICACIÓN DE BOOTSTRAP (OPCIONAL)
+    // ============================================
+    
+    if (typeof bootstrap === 'undefined') {
+        console.warn('⚠️ Bootstrap JS no está cargado. El menú no funcionará correctamente.');
+        console.warn('Asegúrate de incluir: <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>');
+    } else {
+        console.log('✅ Bootstrap JS está cargado correctamente');
+    }
+    
 });
 
-// Agregar estilos de animación si no existen
+// ============================================
+// 6. AGREGAR ESTILOS DE ANIMACIÓN
+// ============================================
+
 const style = document.createElement('style');
 style.textContent = `
-    .value-card, .service-card, .contact-card {
+    .value-card, .service-card, .contact-card, .fleet-item {
         opacity: 0;
         transform: translateY(30px);
         transition: opacity 0.6s ease, transform 0.6s ease;
     }
-    .value-card.animate, .service-card.animate, .contact-card.animate {
+    .value-card.animate, .service-card.animate, .contact-card.animate, .fleet-item.animate {
         opacity: 1;
         transform: translateY(0);
     }
