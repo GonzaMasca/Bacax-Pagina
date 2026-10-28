@@ -131,3 +131,22 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+// ============================================
+// BURBUJA FLOTANTE DE CONTACTO
+// ============================================
+(function() {
+    const fab = document.getElementById('fabContainer');
+    const btn = document.getElementById('fabMain');
+    if (!fab || !btn) return;
+
+    btn.addEventListener('click', function() {
+        fab.classList.toggle('open');
+    });
+
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!fab.contains(e.target)) {
+            fab.classList.remove('open');
+        }
+    });
+})();
