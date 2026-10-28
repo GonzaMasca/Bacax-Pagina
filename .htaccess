@@ -1,0 +1,19 @@
+# ============================================
+# BACAX - configuración del servidor
+# ============================================
+
+# Forzar HTTPS (si ya existe en el servidor, no pasa nada por repetirlo)
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Tipo correcto para los videos WebM (sin esto se sirven como text/plain)
+AddType video/webm .webm
+
+# El HTML se revalida en cada visita para que los cambios se vean al toque.
+# El CSS y el JS no lo necesitan porque ya usan ?v= en el index.html.
+<IfModule mod_headers.c>
+    <FilesMatch "\.html?$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>
